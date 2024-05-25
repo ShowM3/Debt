@@ -313,10 +313,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aea6aeec2b24db54d8009322067d53b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
   speed: 10
   jump: 350
   rb: {fileID: 1376569684}
   isJumping: 0
+
 --- !u!61 &1376569683
 BoxCollider2D:
   m_ObjectHideFlags: 0
