@@ -1,52 +1,38 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed;
-    public float jump;
-    private float Move;
-    public Rigidbody2D rb;
-    public bool isJumping;
+    private float horizontal;
+    private float speed = 8f;
+    private float jumpingPower = 16f;
+    private bool isFacingRight = true;
+
     private bool canDash = true;
     private bool isDashing;
     private float dashingPower = 7f;
     private float dashingTime = 0.2f;
-    private float dashingCooldown = 1f;
-    private float jumpingPower = 8f;
-    private bool doubleJump;
+    private float dashingCooldown = 1f; 
 
-    [SerializeField] private TrailRenderer tr;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private TrailRenderer tr; 
+ 
     void Update()
     {
+
         if (isDashing)
         {
             return;
         }
 
-        if (IsGrounded() && !Input.GetButton("Jump"))
-        {
-            doubleJump = false;
-        }
+        horizontal = Input.GetAxisRaw("Horizontal");
 
-        Move = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(speed * Move, rb.velocity.y);
-
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && IsGrounded())
         {
-            if (IsGrounded() || doubleJump)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
-                doubleJump = !doubleJump;
-            }
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
         }
 
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
@@ -56,27 +42,40 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
         {
-            StartCoroutine(Dash());
+            StartCoroutine(Dash()); 
         }
+
+        Flip();
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void FixedUpdate()
     {
-        if (other.gameObject.CompareTag("Floor"))
+
+        if (isDashing)
         {
-            isJumping = false;
+            return;
         }
+
+        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
     }
 
-    private void OnCollisionExit2D(Collision2D other)
+    private bool IsGrounded()
     {
-        if (other.gameObject.CompareTag("Floor"))
+        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+    }
+
+    private void Flip()
+    {
+        if (isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
         {
-            isJumping = true;
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
         }
     }
 
-    private IEnumerator Dash()
+    private IEnumerator Dash ()
     {
         canDash = false;
         isDashing = true;
@@ -89,14 +88,7 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = originalGravity;
         isDashing = false;
         yield return new WaitForSeconds(dashingCooldown);
-        canDash = true;
+        canDash = true; 
     }
 
-    private bool IsGrounded()
-    {
-        // Implement your own logic to check if the player is grounded
-        // For example, you can use a raycast or a collision check
-        // Return true if the player is grounded, false otherwise
-        return true; // Replace this with your own grounded check logic
-    }
 }
