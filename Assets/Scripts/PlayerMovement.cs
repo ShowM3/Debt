@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+    public Animator animator;
+
     private float horizontal;
     private float speed = 8f;
     private float jumpingPower = 16f;
@@ -34,6 +37,8 @@ public class PlayerMovement : MonoBehaviour
         if (IsGrounded() && !Input.GetButton("Jump"))
         {
             doubleJump = false;
+
+            animator.SetBool("isJumping", false);
         }
 
         if (Input.GetButtonDown("Jump"))
@@ -41,6 +46,8 @@ public class PlayerMovement : MonoBehaviour
             if (IsGrounded() || doubleJump)
             {
                 rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+
+                animator.SetBool("isJumping", true); 
 
                 doubleJump = !doubleJump;
             }
