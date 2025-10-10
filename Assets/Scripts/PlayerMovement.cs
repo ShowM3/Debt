@@ -34,6 +34,21 @@ public class PlayerMovement : MonoBehaviour
 
         horizontal = Input.GetAxisRaw("Horizontal");
 
+        if (Mathf.Abs(horizontal) > 0f)
+        {
+            animator.SetBool("isRunning", true);
+
+            if (Mathf.Abs(horizontal)* speed > 5f)
+            {
+                animator.SetBool("isSprinting", true);
+            }
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isSprinting", false);
+        }
+
         if (IsGrounded() && !Input.GetButton("Jump"))
         {
             doubleJump = false;
